@@ -210,6 +210,45 @@ class Homestead
           s.args = [site['map']]
         end
 
+				# Adding custom SSL Certificates - Begin
+        ssl_cert = site["ssl-cert"] ||= ""
+        ssl_key = site["ssl-key"] ||= ""
+
+				if settings.include? 'ssl_folder'
+				  if ssl_cert != ""
+				      ssl_cert_file = settings["ssl_folder"].to_s + "/" + ssl_cert.to_s
+				      ssl_cert_destination = "/etc/nginx/ssl/".to_s + ssl_cert.to_s
+
+				      if File.exists? File.expand_path(ssl_cert_file)
+				          config.vm.provision "shell" do |s|
+				              s.inline = "sudo rm -f " + ssl_cert_destination + "; sudo echo $1 | grep -xq \"$1\" " + ssl_cert_destination + " || sudo echo \"\n$1\" | tee -a " + ssl_cert_destination
+				              s.args = [File.read(File.expand_path(ssl_cert_file))]
+				          end
+				      else
+				          config.vm.provision "shell" do |s|
+				              s.inline = ">&2 echo \"Unable to copy SSL. Please check in Homestead.yaml\""
+				          end
+				      end
+				  end
+
+				  if ssl_key != ""
+				      ssl_key_file = settings["ssl_folder"].to_s + "/" + ssl_key.to_s
+				      ssl_key_destination = "/etc/nginx/ssl/".to_s + ssl_key.to_s
+
+				      if File.exists? File.expand_path(ssl_key_file)
+				          config.vm.provision "shell" do |s|
+				              s.inline = "sudo rm -f " + ssl_key_destination + "; sudo echo $1 | grep -xq \"$1\" " + ssl_key_destination + " || sudo echo \"\n$1\" | tee -a " + ssl_key_destination
+				              s.args = [File.read(File.expand_path(ssl_key_file))]
+				          end
+				      else
+				          config.vm.provision "shell" do |s|
+				              s.inline = ">&2 echo \"Unable to copy SSL. Please check in Homestead.yaml\""
+				          end
+				      end
+				  end
+				end
+      	# Adding custom SSL Certificates - End
+
         type = site['type'] ||= 'laravel'
 
         case type
