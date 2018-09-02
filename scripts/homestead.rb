@@ -202,6 +202,11 @@ class Homestead
       end
     end
 
+		# Auto mount ssl folder to /home/vagrant/ssl
+		if settings.include? 'ssl_folder'
+			config.vm.synced_folder settings["ssl_folder"].to_s, "/home/vagrant/ssl", type: nil
+		end
+
     # Install All The Configured Nginx Sites
     config.vm.provision 'shell' do |s|
       s.path = script_dir + '/clear-nginx.sh'
@@ -226,38 +231,22 @@ class Homestead
 
 				if settings.include? 'ssl_folder'
 				  if ssl_cert != ""
-				      ssl_cert_file = settings["ssl_folder"].to_s + "/" + ssl_cert.to_s
-				      ssl_cert_destination = "/etc/nginx/ssl/".to_s + ssl_cert.to_s
+						config.vm.provision 'shell' do |s|
+							s.name = 'Copying Certificate: ' + ssl_cert.to_s
+							s.path = script_dir + '/copy-custom-ssl.sh'
+							s.args = ssl_cert.to_s
+						end
+					end
 
-				      if File.exists? File.expand_path(ssl_cert_file)
-				          config.vm.provision "shell" do |s|
-				              s.inline = "sudo rm -f " + ssl_cert_destination + "; sudo echo $1 | grep -xq \"$1\" " + ssl_cert_destination + " || sudo echo \"\n$1\" | tee -a " + ssl_cert_destination
-				              s.args = [File.read(File.expand_path(ssl_cert_file))]
-				          end
-				      else
-				          config.vm.provision "shell" do |s|
-				              s.inline = ">&2 echo \"Unable to copy SSL. Please check in Homestead.yaml\""
-				          end
-				      end
-				  end
-
-				  if ssl_key != ""
-				      ssl_key_file = settings["ssl_folder"].to_s + "/" + ssl_key.to_s
-				      ssl_key_destination = "/etc/nginx/ssl/".to_s + ssl_key.to_s
-
-				      if File.exists? File.expand_path(ssl_key_file)
-				          config.vm.provision "shell" do |s|
-				              s.inline = "sudo rm -f " + ssl_key_destination + "; sudo echo $1 | grep -xq \"$1\" " + ssl_key_destination + " || sudo echo \"\n$1\" | tee -a " + ssl_key_destination
-				              s.args = [File.read(File.expand_path(ssl_key_file))]
-				          end
-				      else
-				          config.vm.provision "shell" do |s|
-				              s.inline = ">&2 echo \"Unable to copy SSL. Please check in Homestead.yaml\""
-				          end
-				      end
-				  end
+					if ssl_key != ""
+						config.vm.provision 'shell' do |s|
+							s.name = 'Copying Certificate: ' + ssl_key.to_s
+							s.path = script_dir + '/copy-custom-ssl.sh'
+							s.args = ssl_key.to_s
+						end
+					end
 				end
-      	# Adding custom SSL Certificates - End
+				# Adding custom SSL Certificates - End
 
         type = site['type'] ||= 'laravel'
         load_balancer = settings['load_balancer'] ||= false
@@ -306,7 +295,7 @@ class Homestead
           end
 
           s.path = script_dir + "/serve-#{type}.sh"
-          s.args = [site['map'], site['to'], site['port'] ||= http_port, site['ssl'] ||= https_port, site['php'] ||= '7.3', params ||= '', site['zray'] ||= 'false', site['xhgui'] ||= '', site['exec'] ||= 'false', headers ||= '', rewrites ||= '']
+          s.args = [site['map'], site['to'], site['port'] ||= http_port, site['ssl'] ||= https_port, site['php'] ||= '7.3', params ||= '', site['zray'] ||= 'false', site['xhgui'] ||= '', site['exec'] ||= 'false', headers ||= '', rewrites ||= '', site["ssl-cert"] ||= '', site["ssl-key"] ||= '']
 
           if site['zray'] == 'true'
             config.vm.provision 'shell' do |s|
