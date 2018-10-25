@@ -9,6 +9,11 @@ class Homestead
 
     # Allow SSH Agent Forward from The Box
     config.ssh.forward_agent = true
+    
+    # Configure Verify Host Key
+    if settings.has_key?('verify_host_key')
+      config.ssh.verify_host_key = settings['verify_host_key']
+    end
 
     # Configure The Box
     config.vm.define settings['name'] ||= 'homestead-7'
@@ -66,7 +71,7 @@ class Homestead
       h.vmname = settings['names'] ||= 'homestead-7'
       h.cpus = settings['cpus'] ||= 1
       h.memory = settings['memory'] ||= 2048
-      h.differencing_disk = true
+      h.linked_clone = true
 
       if Vagrant.has_plugin?('vagrant-hostmanager')
         override.hostmanager.ignore_private_ip = true
@@ -239,6 +244,15 @@ class Homestead
 				# Adding custom SSL Certificates - End
 
         type = site['type'] ||= 'laravel'
+        load_balancer = settings['load_balancer'] ||= false
+        http_port = load_balancer ? '8111' : '80'
+        https_port = load_balancer ? '8112' : '443'
+
+        if load_balancer
+            config.vm.provision 'shell' do |s|
+                s.path = script_dir + '/install-load-balancer.sh'
+            end
+        end
 
         case type
         when 'apigility'
@@ -257,6 +271,13 @@ class Homestead
               params += ' [' + param['key'] + ']=' + param['value']
             end
             params += ' )'
+          end
+          if site.include? 'headers'
+            headers = '('
+            site['headers'].each do |header|
+                headers += ' [' + header['key'] + ']=' + header['value']
+            end
+            headers += ' )'
           end
           s.path = script_dir + "/serve-#{type}.sh"
           s.args = [site['map'], site['to'], site['port'] ||= '80', site['ssl'] ||= '443', site['php'] ||= '7.2', params ||= '', site['zray'] ||= 'false', site["ssl-cert"] ||= '', site["ssl-key"] ||= '']
