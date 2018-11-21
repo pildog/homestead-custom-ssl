@@ -9,7 +9,7 @@ class Homestead
 
     # Allow SSH Agent Forward from The Box
     config.ssh.forward_agent = true
-    
+
     # Configure Verify Host Key
     if settings.has_key?('verify_host_key')
       config.ssh.verify_host_key = settings['verify_host_key']
@@ -148,7 +148,7 @@ class Homestead
             s.args = [File.read(File.expand_path(key)), key.split('/').last]
           end
         else
-          puts 'Check your Homestead.yaml file, the path to your private key does not exist.'
+          puts 'Check your Homestead.yaml (or Homestead.json) file, the path to your private key does not exist.'
           exit
         end
       end
@@ -294,7 +294,7 @@ class Homestead
             end
           else
             config.vm.provision 'shell' do |s|
-              s.inline = 'rm -rf ' + site['to'] + '/ZendServer'
+              s.inline = 'rm -rf ' + site['to'].to_s + '/ZendServer'
             end
           end
         end
@@ -413,6 +413,13 @@ class Homestead
       end
     end
 
+    # Install MySQL 8 If Necessary
+    if settings.has_key?('mysql8') && settings['mysql8']
+        config.vm.provision 'shell' do |s|
+            s.path = script_dir + '/install-mysql8.sh'
+        end
+    end
+
     # Install Neo4j If Necessary
     if settings.has_key?('neo4j') && settings['neo4j']
       config.vm.provision 'shell' do |s|
@@ -487,6 +494,7 @@ class Homestead
         s.path = script_dir + '/install-grafana.sh'
       end
     end
+
 
     # Install chronograf if Necessary
     if settings.has_key?('chronograf') && settings['chronograf']
