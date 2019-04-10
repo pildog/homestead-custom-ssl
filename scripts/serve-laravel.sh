@@ -39,6 +39,17 @@ else sslCertificates="
 "
 fi
 
+if [ "$8" = "" ] && [ "$9" = "" ]
+then sslCertificates="
+    ssl_certificate     /etc/nginx/ssl/$1.crt;
+    ssl_certificate_key /etc/nginx/ssl/$1.key;
+"
+else sslCertificates="
+    ssl_certificate     /etc/nginx/ssl/$8;
+    ssl_certificate_key /etc/nginx/ssl/$9;
+"
+fi
+
 if [ "$7" = "true" ] && [ "$5" = "7.2" ]
 then configureZray="
 location /ZendServer {
