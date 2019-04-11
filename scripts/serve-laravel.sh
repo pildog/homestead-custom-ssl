@@ -28,27 +28,18 @@ if [ -n "${11}" ]; then
    done
 fi
 
-if [ "$8" = "" ] && [ "$9" = "" ]
+# Adding custom SSL Certificates - Begin
+if [ "${12}" = "" ] && [ "${13}" = "" ]
 then sslCertificates="
     ssl_certificate     /etc/nginx/ssl/$1.crt;
     ssl_certificate_key /etc/nginx/ssl/$1.key;
 "
 else sslCertificates="
-    ssl_certificate     /etc/nginx/ssl/$8;
-    ssl_certificate_key /etc/nginx/ssl/$9;
+    ssl_certificate     /etc/nginx/ssl/${12};
+    ssl_certificate_key /etc/nginx/ssl/${13};
 "
 fi
-
-if [ "$8" = "" ] && [ "$9" = "" ]
-then sslCertificates="
-    ssl_certificate     /etc/nginx/ssl/$1.crt;
-    ssl_certificate_key /etc/nginx/ssl/$1.key;
-"
-else sslCertificates="
-    ssl_certificate     /etc/nginx/ssl/$8;
-    ssl_certificate_key /etc/nginx/ssl/$9;
-"
-fi
+# Adding custom SSL Certificates - End
 
 if [ "$7" = "true" ] && [ "$5" = "7.2" ]
 then configureZray="
