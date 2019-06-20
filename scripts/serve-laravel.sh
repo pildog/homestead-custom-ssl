@@ -28,6 +28,15 @@ if [ -n "${11}" ]; then
    done
 fi
 
+if [ "$8" = "true" ]
+then configureXhgui="
+location /xhgui {
+        try_files \$uri \$uri/ /xhgui/index.php?\$args;
+}
+"
+else configureXhgui=""
+fi
+
 # Adding custom SSL Certificates - Begin
 if [ "${12}" = "" ] && [ "${13}" = "" ]
 then sslCertificates="
@@ -40,24 +49,6 @@ else sslCertificates="
 "
 fi
 # Adding custom SSL Certificates - End
-
-if [ "$7" = "true" ] && [ "$5" = "7.2" ]
-then configureZray="
-location /ZendServer {
-        try_files \$uri \$uri/ /ZendServer/index.php?\$args;
-}
-"
-else configureZray=""
-fi
-
-if [ "$8" = "true" ]
-then configureXhgui="
-location /xhgui {
-        try_files \$uri \$uri/ /xhgui/index.php?\$args;
-}
-"
-else configureXhgui=""
-fi
 
 block="server {
     listen ${3:-80};
@@ -76,7 +67,6 @@ block="server {
         $headersTXT
     }
 
-    $configureZray
     $configureXhgui
 
     location = /favicon.ico { access_log off; log_not_found off; }
@@ -115,4 +105,3 @@ block="server {
 
 echo "$block" > "/etc/nginx/sites-available/$1"
 ln -fs "/etc/nginx/sites-available/$1" "/etc/nginx/sites-enabled/$1"
-#echo "127.0.0.1 $1" >> /etc/hosts
