@@ -38,14 +38,14 @@ else configureXhgui=""
 fi
 
 # Adding custom SSL Certificates - Begin
-if [ "${12}" = "" ] && [ "${13}" = "" ]
+if [ "${11}" = "" ] && [ "${12}" = "" ]
 then sslCertificates="
     ssl_certificate     /etc/nginx/ssl/$1.crt;
     ssl_certificate_key /etc/nginx/ssl/$1.key;
 "
 else sslCertificates="
-    ssl_certificate     /etc/nginx/ssl/${12};
-    ssl_certificate_key /etc/nginx/ssl/${13};
+    ssl_certificate     /etc/nginx/ssl/${11};
+    ssl_certificate_key /etc/nginx/ssl/${12};
 "
 fi
 # Adding custom SSL Certificates - End

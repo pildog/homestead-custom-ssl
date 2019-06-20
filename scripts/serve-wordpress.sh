@@ -37,6 +37,19 @@ location /xhgui {
 else configureXhgui=""
 fi
 
+# Adding custom SSL Certificates - Begin
+if [ "${11}" = "" ] && [ "${12}" = "" ]
+then sslCertificates="
+    ssl_certificate     /etc/nginx/ssl/$1.crt;
+    ssl_certificate_key /etc/nginx/ssl/$1.key;
+"
+else sslCertificates="
+    ssl_certificate     /etc/nginx/ssl/${11};
+    ssl_certificate_key /etc/nginx/ssl/${12};
+"
+fi
+# Adding custom SSL Certificates - End
+
 block="server {
     listen ${3:-80};
     listen ${4:-443} ssl http2;
@@ -92,8 +105,7 @@ block="server {
         deny all;
     }
 
-    ssl_certificate     /etc/nginx/ssl/$1.crt;
-    ssl_certificate_key /etc/nginx/ssl/$1.key;
+    $sslCertificates
 }
 "
 
