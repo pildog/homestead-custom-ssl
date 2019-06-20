@@ -203,12 +203,13 @@ class Homestead
       end
     end
 
-<<<<<<< HEAD
+    # Adding custom SSL Certificates - Begin
 		# Auto mount ssl folder to /home/vagrant/ssl
 		if settings.include? 'ssl_folder'
 			config.vm.synced_folder settings["ssl_folder"].to_s, "/home/vagrant/ssl", type: nil
 		end
-=======
+    # Adding custom SSL Certificates - End
+
     # Install Crystal If Necessary
     if settings.has_key?("crystal") && settings["crystal"]
       config.vm.provision "shell" do |s|
@@ -216,7 +217,6 @@ class Homestead
         s.path = script_dir + "/install-crystal.sh"
       end
     end
->>>>>>> 3b390d01464fcbdc09f0aac1a3ddae3ba7f6ec9a
 
     # Install All The Configured Nginx Sites
     config.vm.provision 'shell' do |s|
