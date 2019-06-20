@@ -312,7 +312,7 @@ class Homestead
 
           s.path = script_dir + "/serve-#{type}.sh"
 
-          s.args = [site['map'], site['to'], site['port'] ||= http_port, site['ssl'] ||= https_port, site['php'] ||= '7.3', params ||= '', site['xhgui'] ||= '', site['exec'] ||= 'false', headers ||= '', rewrites ||= '', site["ssl-cert"] ||= '', site["ssl-key"] ||= '']
+          s.args = [site['map'], site['to'], site['port'] ||= http_port, site['ssl'] ||= https_port, site['php'] ||= '7.3', params ||= '', site['zray'] ||= 'false', site['xhgui'] ||= '', site['exec'] ||= 'false', headers ||= '', rewrites ||= '', site["ssl-cert"] ||= '', site["ssl-key"] ||= '']
 
           # generate pm2 json config file
           if site['pm2']
